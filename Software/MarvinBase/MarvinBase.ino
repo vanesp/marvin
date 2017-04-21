@@ -14,6 +14,17 @@ Instructions:
 	- Please adjust ABP adresses and key below to match yours
 	- The loop() is where the actual stuff happens. Adjust input of send_lora_data() in void loop() to send your own data.
 */
+
+// Demo code for Grove - Temperature Sensor V1.1/1.2
+// Loovee @ 2015-8-26
+
+#include <math.h>
+
+const int B=4275;                 // B value of the thermistor
+const int R0 = 100000;            // R0 = 100k
+const int pinTempSensor = A0;     // Grove - Temperature Sensor connect to A0
+
+
 // Port to assign the type of lora data (any port can be used between 1 and 223)
 int     set_port  = 1;
 
@@ -24,9 +35,9 @@ int     RN2483_power_port = 6; //Note that an earlier version of the Marvin does
 int     led_port = 13;
 
 //*** Set parameters here BEGIN ---->
-String  set_nwkskey = "00000000000000000000000000000000";
-String  set_appskey = "00000000000000000000000000000000";
-String  set_devaddr = "00000000";
+String  set_nwkskey = "cee427a11502fd86494bcf8b08767d41"; // Put your 32 hex char here
+String  set_appskey = "d050c7087b2ff676d085af35f8fa043f"; // Put your 32 hex char here
+String  set_devaddr = "142031E4"; // Put your 8 hex char here
 //*** <---- END Set parameters here
 
 
@@ -36,6 +47,8 @@ String  set_devaddr = "00000000";
  * initialized and a LED is called to blink when everything is done. 
  */
 void setup() {
+  delay(1000*5);
+
   InitializeSerials(defaultBaudRate);
   initializeRN2483(RN2483_power_port, reset_port);
   pinMode(led_port, OUTPUT); // Initialize LED port  
@@ -44,11 +57,22 @@ void setup() {
 
 void loop() {
 
-  send_LoRa_data(set_port, "1337");
+  int a = analogRead(pinTempSensor );
+
+  float R = 1023.0/((float)a)-1.0;
+  R = 100000.0*R;
+  float temperature=1.0/(log(R/100000.0)/B+1/298.15)-273.15;//convert to temperature via datasheet ;
+
+  Serial.print("temperature = ");
+  Serial.println(temperature);
+  int TempValue = int(round(temperature * 10));
+
+  send_LoRa_data(set_port, String(TempValue));
   blinky();
   delay(1000);
   read_data_from_LoRa_Mod();
-  delay(60000);
+  delay(60000 * 10);
+  
 }
 
 void InitializeSerials(int baudrate)
