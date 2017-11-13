@@ -74,11 +74,13 @@ void loop() {
         Serial.print(t);
         Serial.println(" *C");
     }
-  int temp = (int) h;
-  int hum = (int) t;  
+  int temp = (int) t;
+  int hum = (int) h;  
   int tempdec = t * 100;
   int humdec = h * 100;
-  
+
+// Uncomment the line below for what you want to send
+
   send_LoRa_data(set_port, String(temp) + "F" + String(hum));      //send temp / hum as rounded int over lora
   //send_LoRa_data(set_port, String(tempdec) + "F" + String(humdec)); //send temp / hum as 4 digit integer (decimals included)
 
